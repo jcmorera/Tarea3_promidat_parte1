@@ -1,0 +1,20 @@
+Package: rpart.plot
+Version: 3.0.7
+Title: Plot 'rpart' Models: An Enhanced Version of 'plot.rpart'
+Author: Stephen Milborrow
+Maintainer: Stephen Milborrow <milbo@sonic.net>
+Depends: R (>= 3.4.0), rpart (>= 4.1-10)
+Suggests: earth (>= 5.1.0)
+Description: Plot 'rpart' models. Extends plot.rpart() and text.rpart()
+    in the 'rpart' package.
+License: GPL-3
+LazyData: yes
+URL: http://www.milbo.org/rpart-plot
+NeedsCompilation: no
+Packaged: 2019-04-12 02:52:17 UTC; milbo
+Repository: CRAN
+Date/Publication: 2019-04-12 10:52:52 UTC
+Built: R 3.5.3; ; 2019-07-08 12:36:28 UTC; windows
+InstallAgent: packrat 0.5.0
+InstallSource: CRAN
+Hash: e5c886572fd0fcdf26bfba459af86d5a

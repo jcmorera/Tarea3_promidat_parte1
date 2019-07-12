@@ -1,0 +1,160 @@
+---
+title: "Tarea3_Parte1"
+author: "Juan Carlos Morea Guido"
+date: "10 de julio de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(FactoMineR)
+library(rattle) # Para usar centers.hclust
+```
+
+#### 1.  Utilizando los paquetes devtools, usethis, packrat y el dataset Datos Churn.csv cree un proyecto de RStudio y realice los siguientes ejercicios:
+
+#### a)  Cree la estructura de carpetas para su proyecto y documente cual es el objetivo de cada una de las carpetas.
+
+** Carpetas del proyecto:
+
+1. data: contiene los datos tablas y modelos. Se compone a su vez por dos carpetas:
+
+  1,1. Carpeta raw: guarda la tabla leída desde la aplicación R Churn, (conjunta la tabla Datos Churn test.csv y Datos Churn train csv.
+  
+  1.2. Carpeta processed: en ella se guardan la tabla ajustada para los modelos a partir de la tabla Churn. Aquí se denominó Churnproceso. Es producto del código descrito en .R/processing/Proceso.R y se utiliza en .R/modeling/ACP.R. Contiene además los dos modelos generados desde ese mismo archivo.
+
+2. Carpeta R, que contiene los códigos de trabajo distribuidos en 3 carpetas:
+
+  2.1. preparation: Contien el archivo Churn.R y las tabla originales train y test. En el archivo .R se leen y consolidan las tablas en una sola denominada Churn.csv
+  
+  2.2. processing: en ella se guarda el archivo Proceso.R que toma la tabla Churn.csv y la limpia y adecua para poder aplicarle los modelos descriptivos generando la tabla Churnproceso.csv que se guarda en data/processed
+  
+  2.3. modeling: contiene el archivo ACP.R que contiene el código para el cálculo de los modelos ACP y hclust y la instrucción para guardar estos en data/processed.
+  
+3. reports: aunque se mantuvo las dos carpetas sugeridas css e imágenes, solo se utiliza la carpeta img para guardar el archivo Tarea3_parte1.rmd
+
+4. test: se utiliza para guardar las pruebas a que se someterá la lectura inicial de la tabla de datos externa Churn.csv y asegurar que los datos no presenten problemas.
+Contiene los archivos test_Churn.R donde se describen los test aplicados y el archivo testthat.R que ejecuta el archivo test_Church R. Por una cuestión de sugerencia se adjunt además una copia del archivo Churn.csv dado que este no se pudo leer desde la carpeta ./data/raw.
+  
+  
+
+
+#### b)  Respetando la estructura de carpetas seleccionada realice un análisis exploratorio que cuente como mínimo con las siguientes etapas:
+#### 1) Lectura de datos (csv o xlsx).
+
+Se incluye en la carpeta ./R/preparation
+
+#### 2) Transformación y limpieza de los datos.
+
+Se incluye en la carpeta ./R/prosessing
+
+#### 3) Análisis exploratorio de los datos.
+
+la ejecución de los modelos se incluye en la carpeta ./R/modeling y la explicación abajo en este documento
+
+#### 4) Reporte de los resultados utilizando Rmarkdown.
+
+Este documento
+
+
+#### Resultado
+
+#### Análisis ACP y gráficas
+
+```{r}
+
+
+res<-readRDS(file="C:/Users/Extreme PC/Documents/ProyectoTarea3/data/processed/modeloACP")
+
+plot(res, axes=c(1, 2), choix="ind", col.ind="red",new.plot=TRUE)
+
+
+
+
+
+```
+
+#### Comentario
+
+Evidente lectura poco eficiente por acúmulo de datos, sin embargo permite observar que hay individuos ubicados en todos los cuadrantes y a distintas distancias desde el centro.
+
+La suma de las dos dimensiones mayormente representadas aproximadaman  solo  el 19% de la variabilidad de la distribución, por lo que las conclusiones no en planos bidimensionales no serán muy representativas.
+
+Nota: La lectura desde el .rmd se debió hacer a partir del directorio raíz de la computadora lo que puede implicar problemas para lecturas posteriores por otros usuarios en otros equipos.
+
+```{r}
+plot(res, axes=c(1, 2), choix="var", col.var="blue",new.plot=TRUE)
+```
+
+
+
+#### Comentario:
+
+Se observa una relación inversa entre el balance de cuenta y la cantidad de productos, es decir existen usuarios que guardan todo sus recursos en una sola cuenta y otros que distribuyen el capital entre varias ofertas de productos.
+En cualquiera de los dos casos no hay relación de estas variables con dejar el banco o con las otras variables estudiadas. 
+La varible que sí tiene una fuerte relacion con dejar el banco es la edad, por cuanto se debe identificar las razones por las cuales hay una apetencia de las personas mayores por dejar el banco. Se debe indentificar si ello no se asocia a defunciones.
+El salario estimado, el scoring crediticio, la tenencia de tarjetas de crédito y la actividad son variables que impresionan tienen una mínima influencia en favor de mantenerse en el banco (oposición a variable dejabanco)
+
+```{r}
+cos2.ind<-(res$ind$cos2[,1]+res$ind$cos2[,2])*100
+x<-cos2.ind>50
+
+may90=cos2.ind[x]
+str(may90)
+str(cos2.ind)
+```
+
+Es llamativo que a pesar de que solo se pudo obtener 19 % de variabilidad en esta gráfica solo 1142 casos de los 9837 usuarios estudiados se ven representados en al menos un 50%.
+
+
+
+
+#### Análisis hclust y gráficas
+
+##### Caso por grupo
+
+```{r}
+modelo<-readRDS(file="C:/Users/Extreme PC/Documents/ProyectoTarea3/data/processed/modelohclust")
+
+
+Ngrupos <- read.table("C:/Users/Extreme PC/Documents/ProyectoTarea3/data/processed/Ngrupos.csv", header=TRUE, sep=',',dec='.',row.names=1)
+head(Ngrupos)
+
+
+```
+
+
+#### Diagrama jerárquico
+
+```{r}
+plot(modelo,hang=-1)
+rect.hclust(modelo, k=13, border="magenta")
+
+
+```
+
+El miismo acúmulo de datos hace difícil de identificar individuos en un clustering jerárquico.
+
+
+#### Distribución de los casos por grupo
+
+```{r}
+hist(Ngrupos[,10])
+```
+
+Sin embargo al agrupaarlos se notan diferencias importantes entre los grupos.
+
+
+
+```{r}
+
+centros <- read.table("C:/Users/Extreme PC/Documents/ProyectoTarea3/data/processed/centros.csv", header=TRUE, sep=',',dec='.',row.names=1)
+centros[,-1]
+
+```
+
+
+#### Comentario
+
+Cada grupo tiene sus características, así por ejmplo, el  grupo 3 que tiene la mayor probabilidad de dejar el banco, contiene la 7ma media de edad, el segundo balance de cuenta más alto, el mejor scoring crediticio, la tercer cantidad de productos más baja, el segundo más alto índice de tarjetas de crédito y el segundo salario estimado promedio más bajo.
+Por su parte, el grupo 2 que tiene la menor probabilidad de dejar el banco, , tiene el promedio de edad más bajo, el scoring crediticio más bajo, el segundo menor balance de cuentas, la mayor cantidad de productos promedio, el tercer más bajo uso de tarjetas y el cuarto salario promedio más alto.
